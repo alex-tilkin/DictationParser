@@ -3,7 +3,7 @@ grammar DictationParser;
 /* Parser */
 
 // Top
-command: creationCommand; // | NavigationCommand | ModificationCommand | SelectionCommand;
+command: creationCommand | navigationCommand;// | ModificationCommand | SelectionCommand;
 
 // Creation Layer
 creationCommand: creationVerb (AN | A)? (createField | createMethod | createDataType | createBlock | createStatement) elementLocation?;
@@ -13,7 +13,13 @@ createMethod: modifier? (METHOD | FUNCTION) namedElement ((THAT_ACCEPTS | WITH) 
 createDataType: modifier? (INNER)? dataType namedElement;
 createBlock: BLOCK;
 createStatement: createExpression;// | <Create-Control-Flow-Statement>
-createExpression: //<Create-Assignment-Expression> | <Create-Method-Invocation-Expression> | <Create-Object-Creation-Expression> | <Create-Increment-Decrement-Expression>;
+createExpression: BULK;//<Create-Assignment-Expression> | <Create-Method-Invocation-Expression> | <Create-Object-Creation-Expression> | <Create-Increment-Decrement-Expression>;
+
+// Navigation Layer
+navigationCommand: navigationVerb (dataType | FIELD | METHOD)? ElementName | exitCommand;
+navigationVerb: GO_TO | WE_ARE_DONE_WIT;
+exitCommand: (EXIT | QUIT) elementRef;
+exit: WE_ARE_DONE_WIT | EXIT;
 
 // Common
 fieldModifier: modifier FINAL? TRANSIENT? VOLATILE?;
@@ -36,6 +42,9 @@ dataType: CLASS | ENUM | INTERFACE;
 line: LINE NUMBER? Number;
 
 /* Lexer */
+
+BULK: 'bulk';
+
 AND: 'and';
 
 THAT_ACCEPTS: 'that accepts';
@@ -64,6 +73,11 @@ NAMED: 'named';
 CALLED: 'called';
 LINE: 'line';
 NUMBER: 'number';
+
+GO_TO: 'go to';
+EXIT: 'exit';
+QUIT: 'quit';
+WE_ARE_DONE_WIT: 'we are done with';
 
 //ABSTRACT      : 'abstract';
 //ASSERT        : 'assert';
