@@ -6,13 +6,14 @@ grammar DictationParser;
 command: creationCommand | navigationCommand | selectionCommand | modificationCommand;
 
 // Creation Layer
-creationCommand: creationVerb (AN | A)? (createField | createMethod | createDataType | createBlock | createStatement) elementLocation?;
+creationCommand: creationVerb (AN | A)? (createField | createMethod | createDataType | createBlock | ) elementLocation?;
 creationVerb: CREATE | NEW;
 createField: fieldModifier? fieldRef;
 createMethod: modifier? (METHOD | FUNCTION) namedElement ((THAT_ACCEPTS | WITH) parametersList)?;
 createDataType: modifier? (INNER)? dataType namedElement;
-createBlock: BLOCK;
-createStatement: createExpression;// | <Create-Control-Flow-Statement>
+createBlock: BLOCK | createBlockStatement;
+createBlockStatement: localVariableDeclaration;// | statement | typeDeclaration;//createExpression | <Create-Control-Flow-Statement>
+localVariableDeclaration: variableModifier? FIELD elementsName OF_TYPE ElementType;
 createExpression: KURK;//<Create-Assignment-Expression> | <Create-Method-Invocation-Expression> | <Create-Object-Creation-Expression> | <Create-Increment-Decrement-Expression>;
 
 // Navigation Layer
@@ -21,24 +22,26 @@ navigationVerb: GO_TO | WE_ARE_DONE_WIT;
 exitCommand: (EXIT | QUIT) elementRef;
 exit: WE_ARE_DONE_WIT | EXIT;
 
-// Modification
+// Modification Layer
 modificationCommand: modifyAccessLevel;
 modifyAccessLevel: modificationVerb accessLevel;
 modificationVerb: MAKE_IT | CHANGE_IT;
 
-// Selection
+// Selection Layer
 selectionCommand: (NUMBER | OPTION)? Number;
 
-// Common
+// Common Layer
 fieldModifier: modifier FINAL? TRANSIENT? VOLATILE?;
+variableModifier: FINAL;
 modifier: STATIC? accessLevel;
 accessLevel: PRIVATE | PUBLIC | PROTECTED;
 
 elementLocation: locationRef (elementRef | line);
-fieldRef:  FIELD (ElementName? OF_TYPE ElementType | OF_TYPE ElementType namedElement | ElementName);
+fieldRef:  FIELD (elementsName? OF_TYPE ElementType | OF_TYPE ElementType namedElement | elementsName);
 elementRef: classRef | fieldRef | enumRef | interfaceRef | unspecifiedRef;
 classRef: CLASS ElementName;
 namedElement: reference? ElementName;
+elementsName: (ElementName AND)* ElementName;
 enumRef: ENUM ElementName;
 interfaceRef: INTERFACE ElementName;
 unspecifiedRef: ElementName;
