@@ -3,7 +3,7 @@ grammar DictationParser;
 /* Parser */
 
 // Top
-command: creationCommand | navigationCommand;// | ModificationCommand | SelectionCommand;
+command: creationCommand | navigationCommand | selectionCommand | modificationCommand;
 
 // Creation Layer
 creationCommand: creationVerb (AN | A)? (createField | createMethod | createDataType | createBlock | createStatement) elementLocation?;
@@ -13,13 +13,21 @@ createMethod: modifier? (METHOD | FUNCTION) namedElement ((THAT_ACCEPTS | WITH) 
 createDataType: modifier? (INNER)? dataType namedElement;
 createBlock: BLOCK;
 createStatement: createExpression;// | <Create-Control-Flow-Statement>
-createExpression: BULK;//<Create-Assignment-Expression> | <Create-Method-Invocation-Expression> | <Create-Object-Creation-Expression> | <Create-Increment-Decrement-Expression>;
+createExpression: KURK;//<Create-Assignment-Expression> | <Create-Method-Invocation-Expression> | <Create-Object-Creation-Expression> | <Create-Increment-Decrement-Expression>;
 
 // Navigation Layer
 navigationCommand: navigationVerb (dataType | FIELD | METHOD)? ElementName | exitCommand;
 navigationVerb: GO_TO | WE_ARE_DONE_WIT;
 exitCommand: (EXIT | QUIT) elementRef;
 exit: WE_ARE_DONE_WIT | EXIT;
+
+// Modification
+modificationCommand: modifyAccessLevel;
+modifyAccessLevel: modificationVerb accessLevel;
+modificationVerb: MAKE_IT | CHANGE_IT;
+
+// Selection
+selectionCommand: (NUMBER | OPTION)? Number;
 
 // Common
 fieldModifier: modifier FINAL? TRANSIENT? VOLATILE?;
@@ -43,19 +51,19 @@ line: LINE NUMBER? Number;
 
 /* Lexer */
 
-BULK: 'bulk';
+KURK: 'kurk'; // Not part of the language.
 
+//
 AND: 'and';
+OR: 'or';
 
-THAT_ACCEPTS: 'that accepts';
-WITH: 'with';
-
+// Language idioms
 METHOD: 'method';
 FUNCTION: 'function';
+FIELD: 'field';
+BLOCK: 'block';
 
-AN: 'an';
-A: 'a';
-
+// Orientation
 INSIDE: 'inside';
 IN: 'in';
 AFTER: 'after';
@@ -64,20 +72,27 @@ ABOVE: 'above';
 BELOW: 'below';
 INNER: 'inner';
 
+// Reference
 OF_TYPE: 'of type';
-CREATE: 'create';
 NEW: 'new';
-FIELD: 'field';
-BLOCK: 'block';
 NAMED: 'named';
 CALLED: 'called';
 LINE: 'line';
 NUMBER: 'number';
+OPTION: 'option';
+AN: 'an';
+A: 'a';
+THAT_ACCEPTS: 'that accepts';
+WITH: 'with';
 
+// Commands
 GO_TO: 'go to';
 EXIT: 'exit';
 QUIT: 'quit';
 WE_ARE_DONE_WIT: 'we are done with';
+MAKE_IT: 'make it';
+CHANGE_IT: 'change it to';
+CREATE: 'create';
 
 //ABSTRACT      : 'abstract';
 //ASSERT        : 'assert';
@@ -133,26 +148,4 @@ VOLATILE      : 'volatile';
 Number: [0-9] | 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine';
 ElementType : [a-zA-Z$_]+;
 ElementName : [a-zA-Z0-9$_]+;
-
-
-/*fragment JavaLetter
-    :   [a-zA-Z$_]; // these are the "java letters" below 0xFF
-    |   // covers all characters above 0xFF which are not a surrogate
-        ~[\u0000-\u00FF\uD800-\uDBFF]
-        {Character.isJavaIdentifierStart(_input.LA(-1))}?
-    |   // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
-        [\uD800-\uDBFF] [\uDC00-\uDFFF]
-        {Character.isJavaIdentifierStart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
-    ;*/
-
-/*fragment JavaLetterOrDigit
-    :   [a-zA-Z0-9$_]; // these are the "java letters or digits" below 0xFF
-    |   // covers all characters above 0xFF which are not a surrogate
-        ~[\u0000-\u00FF\uD800-\uDBFF]
-        {Character.isJavaIdentifierPart(_input.LA(-1))}?
-    |   // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
-        [\uD800-\uDBFF] [\uDC00-\uDFFF]
-        {Character.isJavaIdentifierPart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
-    ;*/
-
 WS  :  [ \t\r\n\u000C]+ -> skip;
