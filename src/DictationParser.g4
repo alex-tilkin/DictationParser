@@ -14,9 +14,10 @@ createConstructor: modifier? CONSTRUCTOR ((THAT_ACCEPTS | WITH) parametersList)?
 createDataType: modifier? (INNER)? dataType namedElement;
 createBlock: BLOCK | createBlockStatement;
 createBlockStatement: localVariableDeclaration | statement;
-createLoop: createForLoop | createWhileLoop | createDoWhileLoop | createForEachLoop;
-createForEachLoop: FOR_EACH ;
-FOR_EACH: 'for each' | 'foreach';
+createLoop: createForEachLoop | createWhileLoop | createDoWhileLoop /* | createForLoop*/;
+createForEachLoop: FOR_EACH Element IN Element command?;
+createWhileLoop: WHILE expression DO? command;
+createDoWhileLoop: DO command WHILE expression;
 /*createForLoop: FOR ;
 forControl
     :   enhancedForControl
@@ -27,12 +28,11 @@ forInit
     :   localVariableDeclaration
 //    |   expressionList
     ;*/
-createWhileLoop:;
-createDoWhileLoop:;
-createForEachLoop:;
+//createWhileLoop:;
+//createDoWhileLoop:;
 
 // Navigation Layer
-navigationCommand: navigationVerb (dataType | FIELD | METHOD)? ElementName | exitCommand;
+navigationCommand: navigationVerb (dataType | FIELD | METHOD)? Element | exitCommand;
 navigationVerb: GO_TO | WE_ARE_DONE_WIT;
 exitCommand: (EXIT | QUIT) elementRef;
 exit: WE_ARE_DONE_WIT | EXIT;
@@ -49,15 +49,16 @@ selectionCommand: (NUMBER | OPTION)? Number;
 deletionCommand: (DELETE | REMOVE) (line | elementRef);
 
 // Invocation Layer
-invokationCommand: CALL? ElementName (OF ElementName);
+invokationCommand: CALL? Element (OF Element);
 
 // Common Layer
 fieldModifier: FINAL? modifier TRANSIENT? VOLATILE?;
 variableModifier: FINAL | STATIC;
 modifier: STATIC? accessLevel;
 accessLevel: PRIVATE | PUBLIC | PROTECTED;
-localVariableDeclaration: variableModifier* elementsName OF_TYPE ElementType;
-statement: expression;// | ASSERT expression (':' expression)?;
+localVariableDeclaration: variableModifier* elementsName OF_TYPE Element;
+statement:  expression |
+            RETURN expression?;// | ASSERT expression (':' expression)?;
     /*|   'if' parExpression statement ('else' statement)?
     |   'for' '(' forControl ')' statement
     |   'while' parExpression statement
@@ -66,7 +67,7 @@ statement: expression;// | ASSERT expression (':' expression)?;
     |   'try' resourceSpecification block catchClause* finallyBlock?
     |   'switch' parExpression '{' switchBlockStatementGroup* switchLabel* '}'
     |   'synchronized' parExpression block
-    |   'return' expression?
+
     |   'throw' expression
     |   'break' Identifier?
     |   'continue' Identifier?
@@ -75,13 +76,11 @@ statement: expression;// | ASSERT expression (':' expression)?;
     ;*/
 expression: primary |
             expression (PLUS_PLUS | MINUS_MINUS) |
-            expression (IS_EQUAL | IS_DIFFERENT) expression |
             expression AND expression |
             expression OR expression |
             (PLUS | MINUS | PLUS_PLUS | MINUS_MINUS) expression |
-            expression (LESS_THAN_EQUAL | GREATER_THAN_EQUAL | GREATER_THAN | LESS_THAN) expression |
-            IF expression (IS_EQUAL | IS_DIFFERENT | LESS_THAN_EQUAL | GREATER_THAN_EQUAL | GREATER_THAN | LESS_THAN) expression THEN expression
-            (ELSE expression)?;
+            expression (IS_EQUAL | IS_DIFFERENT | LESS_THAN_EQUAL | GREATER_THAN_EQUAL | GREATER_THAN | LESS_THAN | IS_NOT | IS) expression |
+            IF expression (IS_EQUAL | IS_DIFFERENT | LESS_THAN_EQUAL | GREATER_THAN_EQUAL | GREATER_THAN | LESS_THAN | IS_NOT | IS) expression THEN command (ELSE command)?;
 
  //    |   expression '.' Identifier
  //    |   expression '.' 'this'
@@ -114,7 +113,7 @@ expression: primary |
  //        |   '%='
  //        )
  //        expression
-primary: OPEN_PRANTECES expression | ElementName;
+primary: OPEN_PRANTECES expression | Element | Number;
 /*    :   '(' expression ')'
     |   'this'
     |   'super'
@@ -125,18 +124,18 @@ primary: OPEN_PRANTECES expression | ElementName;
     ;*/
 
 elementLocation: locationRef (elementRef | line);
-fieldRef:  FIELD (elementsName? OF_TYPE ElementType | OF_TYPE ElementType namedElement | elementsName);
+fieldRef:  FIELD (elementsName? OF_TYPE Element | OF_TYPE Element namedElement | elementsName);
 elementRef: classRef | fieldRef | enumRef | interfaceRef | unspecifiedRef;
-classRef: CLASS ElementName;
+classRef: CLASS Element;
 namedElement: reference? elementsName;
-elementsName: (ElementName AND)* ElementName;
-enumRef: ENUM ElementName;
-interfaceRef: INTERFACE ElementName;
-unspecifiedRef: ElementName;
+elementsName: (Element AND)* Element;
+enumRef: ENUM Element;
+interfaceRef: INTERFACE Element;
+unspecifiedRef: Element;
 reference: NAMED | CALLED;
 locationRef: INSIDE | IN | AFTER | BEFORE | ABOVE | BELOW;
 parametersList: (parameter AND)* parameter;
-parameter: ElementName OF_TYPE ElementType;
+parameter: Element OF_TYPE Element;
 dataType: CLASS | ENUM | INTERFACE;
 line: LINE NUMBER? Number;
 
@@ -193,8 +192,10 @@ MINUS: 'minus';
 PLUS: 'plus';
 PLUS_PLUS: 'plus plus' | '++' | '+ +';
 MINUS_MINUS: 'minus minus' | '--' | '- -';
-IS_EQUAL: 'is equal to' | 'equal to' | 'equals to';
-IS_DIFFERENT: 'is different from' | 'different';
+IS: 'is';
+IS_NOT: 'is not';
+IS_EQUAL: 'is equal to' | 'equal to' | 'equals to' | 'equals' | 'is equals';
+IS_DIFFERENT: 'is different from' | 'different from';
 LESS_THAN: 'less than' | '<' | 'is less than';
 LESS_THAN_EQUAL: 'less than equal' | '<=' | '< =';
 GREATER_THAN: 'greater than' | '>' | 'is greater than';
@@ -237,7 +238,7 @@ INTERFACE     : 'interface';
 PRIVATE       : 'private';
 PROTECTED     : 'protected';
 PUBLIC        : 'public';
-//RETURN        : 'return';
+RETURN        : 'return';
 //SHORT         : 'short';
 STATIC        : 'static';
 //STRICTFP      : 'strictfp';
@@ -252,8 +253,8 @@ TRANSIENT     : 'transient';
 //VOID          : 'void';
 VOLATILE      : 'volatile';
 WHILE         : 'while';
+FOR_EACH: 'for each' | 'foreach';
 
-Number: [0-9]+ | 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine';
-ElementType : [a-zA-Z$_]+;
-ElementName : [a-zA-Z0-9$_]+;
+Number: [0-9]+ | 'zero' | 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine';
+Element: [a-z0-9]+;
 WS  :  [ \t\r\n\u000C]+ -> skip;
