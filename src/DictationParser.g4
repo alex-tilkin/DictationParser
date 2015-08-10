@@ -14,12 +14,12 @@ createConstructor: modifier? CONSTRUCTOR ((THAT_ACCEPTS | WITH) parametersList)?
 createDataType: modifier? (INNER)? dataType namedElement;
 createBlock: BLOCK | createBlockStatement;
 createBlockStatement: localVariableDeclaration | statement;
-createLoop: createForEachLoop | createWhileLoop | createDoWhileLoop /* | createForLoop*/;
+createLoop: createForEachLoop | createWhileLoop | createDoWhileLoop | createForLoop;
 createForEachLoop: FOR_EACH Element IN Element command?;
-createWhileLoop: WHILE expression DO? command;
+createWhileLoop: WHILE expression DO? command?;
 createDoWhileLoop: DO command WHILE expression;
-/*createForLoop: FOR ;
-forControl
+createForLoop: FOR ;
+/*forControl
     :   enhancedForControl
     |   forInit? ';' expression? ';' forUpdate?
     ;
@@ -28,8 +28,6 @@ forInit
     :   localVariableDeclaration
 //    |   expressionList
     ;*/
-//createWhileLoop:;
-//createDoWhileLoop:;
 
 // Navigation Layer
 navigationCommand: navigationVerb (dataType | FIELD | METHOD)? Element | exitCommand;
@@ -54,12 +52,16 @@ invokationCommand: CALL? Element (OF Element);
 // Common Layer
 fieldModifier: FINAL? modifier TRANSIENT? VOLATILE?;
 variableModifier: FINAL | STATIC;
-modifier: STATIC? accessLevel;
+modifier: ABSTRACT? STATIC? accessLevel;
 accessLevel: PRIVATE | PUBLIC | PROTECTED;
 localVariableDeclaration: variableModifier* elementsName OF_TYPE Element;
 statement:  expression |
-            RETURN expression?;// | ASSERT expression (':' expression)?;
-    /*|   'if' parExpression statement ('else' statement)?
+            RETURN expression? |
+            TRY CATCH |
+            THROW expression;
+    /*
+    |   ASSERT expression (':' expression)?;
+    |   'if' parExpression statement ('else' statement)?
     |   'for' '(' forControl ')' statement
     |   'while' parExpression statement
     |   'do' statement 'while' parExpression
@@ -67,13 +69,12 @@ statement:  expression |
     |   'try' resourceSpecification block catchClause* finallyBlock?
     |   'switch' parExpression '{' switchBlockStatementGroup* switchLabel* '}'
     |   'synchronized' parExpression block
-
-    |   'throw' expression
     |   'break' Identifier?
     |   'continue' Identifier?
     |   statementExpression
     |   Identifier ':' statement
     ;*/
+
 expression: primary |
             expression (PLUS_PLUS | MINUS_MINUS) |
             expression AND expression |
@@ -113,16 +114,7 @@ expression: primary |
  //        |   '%='
  //        )
  //        expression
-primary: OPEN_PRANTECES expression | Element | Number;
-/*    :   '(' expression ')'
-    |   'this'
-    |   'super'
-    |   literal
-    |   type '.' 'class'
-    |   'void' '.' 'class'
-    |   nonWildcardTypeArguments (explicitGenericInvocationSuffix | 'this' arguments)
-    ;*/
-
+primary: OPEN_PRANTECES expression? | Element | Number;
 elementLocation: locationRef (elementRef | line);
 fieldRef:  FIELD (elementsName? OF_TYPE Element | OF_TYPE Element namedElement | elementsName);
 elementRef: classRef | fieldRef | enumRef | interfaceRef | unspecifiedRef;
@@ -203,13 +195,13 @@ GREATER_THAN_EQUAL: 'greater than equal' | '>=' | '> =';
 IF: 'if';
 THEN: 'then';
 
-//ABSTRACT      : 'abstract';
+ABSTRACT      : 'abstract';
 ASSERT        : 'assert';
 //BOOLEAN       : 'boolean';
 //BREAK         : 'break';
 //BYTE          : 'byte';
 //CASE          : 'case';
-//CATCH         : 'catch';
+CATCH         : 'catch';
 //CHAR          : 'char';
 CLASS         : 'class';
 //CONST         : 'const';
@@ -233,7 +225,6 @@ FOR           : 'for';
 INTERFACE     : 'interface';
 //LONG          : 'long';
 //NATIVE        : 'native';
-//NEW           : 'new';
 //PACKAGE       : 'package';
 PRIVATE       : 'private';
 PROTECTED     : 'protected';
@@ -246,10 +237,10 @@ STATIC        : 'static';
 //SWITCH        : 'switch';
 //SYNCHRONIZED  : 'synchronized';
 //THIS          : 'this';
-//THROW         : 'throw';
-//THROWS        : 'throws';
+THROW         : 'throw';
+THROWS        : 'throws';
 TRANSIENT     : 'transient';
-//TRY           : 'try';
+TRY           : 'try';
 //VOID          : 'void';
 VOLATILE      : 'volatile';
 WHILE         : 'while';
