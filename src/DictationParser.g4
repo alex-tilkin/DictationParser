@@ -9,9 +9,9 @@ command: creationCommand | navigationCommand | selectionCommand | modificationCo
 creationCommand: creationVerb? (AN | A)? (createField | createMethod | createConstructor | createDataType | createBlock | createLoop) elementLocation?;
 creationVerb: CREATE | NEW | OPEN;
 createField: fieldModifier? fieldRef;
-createMethod: modifier? (METHOD | FUNCTION) namedElement ((THAT_ACCEPTS | WITH) parametersList)?;
+createMethod: modifier? (METHOD | FUNCTION) namedElement ((THAT_ACCEPTS | WITH) parametersList)? (return Element)?;
 createConstructor: modifier? CONSTRUCTOR ((THAT_ACCEPTS | WITH) parametersList)?;
-createDataType: modifier? (INNER)? dataType namedElement;
+createDataType: modifier? (INNER)? dataType namedElement ((implements | extends) Element)?;
 createBlock: BLOCK | createBlockStatement;
 createBlockStatement: localVariableDeclaration | statement;
 createLoop: createForEachLoop | createWhileLoop | createDoWhileLoop | createForLoop;
@@ -32,7 +32,7 @@ forInit
 // Navigation Layer
 navigationCommand: navigationVerb (dataType | FIELD | METHOD)? Element | exitCommand;
 navigationVerb: GO_TO | WE_ARE_DONE_WIT;
-exitCommand: (EXIT | QUIT) elementRef;
+exitCommand: (EXIT | QUIT) (elementRef | (dataType | FIELD | METHOD)? Element);
 exit: WE_ARE_DONE_WIT | EXIT;
 
 // Modification Layer
@@ -47,7 +47,7 @@ selectionCommand: (NUMBER | OPTION)? Number;
 deletionCommand: (DELETE | REMOVE) (line | elementRef);
 
 // Invocation Layer
-invokationCommand: CALL? Element (OF Element);
+invokationCommand: CALL? Element (OF Element)?;
 
 // Common Layer
 fieldModifier: FINAL? modifier TRANSIENT? VOLATILE?;
@@ -81,7 +81,9 @@ expression: primary |
             expression OR expression |
             (PLUS | MINUS | PLUS_PLUS | MINUS_MINUS) expression |
             expression (IS_EQUAL | IS_DIFFERENT | LESS_THAN_EQUAL | GREATER_THAN_EQUAL | GREATER_THAN | LESS_THAN | IS_NOT | IS) expression |
-            IF expression (IS_EQUAL | IS_DIFFERENT | LESS_THAN_EQUAL | GREATER_THAN_EQUAL | GREATER_THAN | LESS_THAN | IS_NOT | IS) expression THEN command (ELSE command)?;
+            IF expression (IS_EQUAL | IS_DIFFERENT | LESS_THAN_EQUAL | GREATER_THAN_EQUAL | GREATER_THAN | LESS_THAN | IS_NOT | IS) expression THEN command (ELSE command)? |
+            NEW (expression | elementRef) |
+            ASSIGN expression TO expression;
 
  //    |   expression '.' Identifier
  //    |   expression '.' 'this'
@@ -114,7 +116,7 @@ expression: primary |
  //        |   '%='
  //        )
  //        expression
-primary: OPEN_PRANTECES expression? | Element | Number;
+primary: OPEN_PRANTECES expression? | Element (OF Element)? | Number;
 elementLocation: locationRef (elementRef | line);
 fieldRef:  FIELD (elementsName? OF_TYPE Element | OF_TYPE Element namedElement | elementsName);
 elementRef: classRef | fieldRef | enumRef | interfaceRef | unspecifiedRef;
@@ -130,7 +132,9 @@ parametersList: (parameter AND)* parameter;
 parameter: Element OF_TYPE Element;
 dataType: CLASS | ENUM | INTERFACE;
 line: LINE NUMBER? Number;
-
+return: THAT_RETURNS | RETURNS | RETURN;
+implements: IMPLEMENTS | IMPLEMENT | THAT_IMPLEMENTS;
+extends: EXTENDS | EXTEND | THAT_EXTENDS;
 /* Lexer */
 
 // Language idioms
@@ -163,6 +167,7 @@ THAT_ACCEPTS: 'that accepts';
 WITH: 'with';
 AND: 'and';
 OR: 'or';
+TO: 'to';
 
 // Commands
 GO_TO: 'go to';
@@ -178,6 +183,7 @@ CALL: 'call';
 OF: 'of';
 DELETE: 'delete';
 REMOVE: 'remove';
+ASSIGN: 'assign';
 
 // Operators
 MINUS: 'minus';
@@ -197,55 +203,50 @@ THEN: 'then';
 
 ABSTRACT      : 'abstract';
 ASSERT        : 'assert';
-//BOOLEAN       : 'boolean';
 //BREAK         : 'break';
-//BYTE          : 'byte';
 //CASE          : 'case';
 CATCH         : 'catch';
-//CHAR          : 'char';
 CLASS         : 'class';
 //CONST         : 'const';
 //CONTINUE      : 'continue';
 //DEFAULT       : 'default';
 DO            : 'do';
-//DOUBLE        : 'double';
 ELSE          : 'else';
 ENUM          : 'enum';
-//EXTENDS       : 'extends';
+EXTENDS       : 'extends';
+EXTEND: 'extend';
+THAT_EXTENDS: 'that extends';
 FINAL         : 'final';
 //FINALLY       : 'finally';
-//FLOAT         : 'float';
 FOR           : 'for';
-//IF            : 'if';
-//GOTO          : 'goto';
-//IMPLEMENTS    : 'implements';
+IMPLEMENTS    : 'implements';
+THAT_IMPLEMENTS: 'that implements';
+IMPLEMENT: 'implement';
 //IMPORT        : 'import';
 //INSTANCEOF    : 'instanceof';
-//INT           : 'int';
 INTERFACE     : 'interface';
-//LONG          : 'long';
 //NATIVE        : 'native';
 //PACKAGE       : 'package';
 PRIVATE       : 'private';
 PROTECTED     : 'protected';
 PUBLIC        : 'public';
-RETURN        : 'return';
-//SHORT         : 'short';
 STATIC        : 'static';
 //STRICTFP      : 'strictfp';
-//SUPER         : 'super';
+SUPER         : 'super';
 //SWITCH        : 'switch';
 //SYNCHRONIZED  : 'synchronized';
-//THIS          : 'this';
 THROW         : 'throw';
 THROWS        : 'throws';
 TRANSIENT     : 'transient';
 TRY           : 'try';
-//VOID          : 'void';
+VOID          : 'void';
 VOLATILE      : 'volatile';
 WHILE         : 'while';
 FOR_EACH: 'for each' | 'foreach';
+THAT_RETURNS: 'that returns';
+RETURNS: 'returns';
+RETURN: 'return';
 
 Number: [0-9]+ | 'zero' | 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine';
-Element: [a-z0-9]+;
+Element: [a-z0-9\-]+;
 WS  :  [ \t\r\n\u000C]+ -> skip;
