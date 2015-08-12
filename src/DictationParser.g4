@@ -76,10 +76,10 @@ statement:  expression |
     ;*/
 
 expression: primary |
-            expression (PLUS_PLUS | MINUS_MINUS) |
+            expression (PLUS PLUS | MINUS MINUS) |
             expression AND expression |
             expression OR expression |
-            (PLUS | MINUS | PLUS_PLUS | MINUS_MINUS) expression |
+            (PLUS | MINUS | PLUS PLUS | MINUS MINUS) expression |
             expression (IS_EQUAL | IS_DIFFERENT | LESS_THAN_EQUAL | GREATER_THAN_EQUAL | GREATER_THAN | LESS_THAN | IS_NOT | IS) expression |
             IF expression (IS_EQUAL | IS_DIFFERENT | LESS_THAN_EQUAL | GREATER_THAN_EQUAL | GREATER_THAN | LESS_THAN | IS_NOT | IS) expression THEN command (ELSE command)? |
             NEW (expression | elementRef) |
