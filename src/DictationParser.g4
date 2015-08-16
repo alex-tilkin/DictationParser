@@ -41,7 +41,7 @@ modifyAccessLevel: modificationVerb accessLevel;
 modificationVerb: MAKE_IT | CHANGE_IT;
 
 // Selection Layer
-selectionCommand: (NUMBER | OPTION)? Number;
+selectionCommand: (NUMBER | OPTION)? number;
 
 // Deletion Layer
 deletionCommand: (DELETE | REMOVE) (line | elementRef);
@@ -116,7 +116,7 @@ expression: primary |
  //        |   '%='
  //        )
  //        expression
-primary: OPEN_PRANTECES expression? | Element (OF Element)? | Number;
+primary: OPEN_PRANTECES expression? | Element (OF Element)? | number;
 elementLocation: locationRef (elementRef | line);
 fieldRef:  FIELD (elementsName? OF_TYPE Element | OF_TYPE Element namedElement | elementsName);
 elementRef: classRef | fieldRef | enumRef | interfaceRef | unspecifiedRef;
@@ -131,10 +131,11 @@ locationRef: INSIDE | IN | AFTER | BEFORE | ABOVE | BELOW;
 parametersList: (parameter AND)* parameter;
 parameter: Element OF_TYPE Element;
 dataType: CLASS | ENUM | INTERFACE;
-line: LINE NUMBER? Number;
+line: LINE NUMBER? number;
 return: THAT_RETURNS | RETURNS | RETURN;
 implements: IMPLEMENTS | IMPLEMENT | THAT_IMPLEMENTS;
 extends: EXTENDS | EXTEND | THAT_EXTENDS;
+number: Number | ZERO | ONE | TWO | THREE | FOUR | FIVE | SIX | SEVEN | EIGHT | NINE;
 /* Lexer */
 
 // Language idioms
@@ -247,6 +248,16 @@ THAT_RETURNS: 'that returns';
 RETURNS: 'returns';
 RETURN: 'return';
 
-Number: [0-9]+ | 'zero' | 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine';
+ZERO: 'zero';
+ONE: 'one';
+TWO: 'two';
+THREE: 'three';
+FOUR: 'four';
+FIVE: 'five';
+SIX: 'six';
+SEVEN: 'seven';
+EIGHT: 'eight';
+NINE: 'nine';
+Number: [0-9]+;
 Element: [a-z0-9\-]+;
 WS  :  [ \t\r\n\u000C]+ -> skip;
