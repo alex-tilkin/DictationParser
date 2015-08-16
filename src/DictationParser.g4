@@ -55,10 +55,7 @@ variableModifier: FINAL | STATIC;
 modifier: ABSTRACT? STATIC? accessLevel;
 accessLevel: PRIVATE | PUBLIC | PROTECTED;
 localVariableDeclaration: variableModifier* elementsName OF_TYPE Element;
-statement:  expression |
-            RETURN expression? |
-            TRY CATCH |
-            THROW expression;
+statement: expression | RETURN expression? | TRY CATCH | THROW expression;
     /*
     |   ASSERT expression (':' expression)?;
     |   'if' parExpression statement ('else' statement)?
@@ -136,6 +133,9 @@ return: THAT_RETURNS | RETURNS | RETURN;
 implements: IMPLEMENTS | IMPLEMENT | THAT_IMPLEMENTS;
 extends: EXTENDS | EXTEND | THAT_EXTENDS;
 number: Number | ZERO | ONE | TWO | THREE | FOUR | FIVE | SIX | SEVEN | EIGHT | NINE;
+plus: PLUS | MATH_PLUS;
+minus: MINUS | MATH_MINUS;
+
 /* Lexer */
 
 // Language idioms
@@ -187,10 +187,11 @@ REMOVE: 'remove';
 ASSIGN: 'assign';
 
 // Operators
-MINUS: 'minus';
+
 PLUS: 'plus';
-PLUS_PLUS: 'plus plus' | '++' | '+ +';
-MINUS_MINUS: 'minus minus' | '--' | '- -';
+MATH_PLUS: '+';
+MINUS: 'minus';
+MATH_MINUS: '-';
 IS: 'is';
 IS_NOT: 'is not';
 IS_EQUAL: 'is equal to' | 'equal to' | 'equals to' | 'equals' | 'is equals';
