@@ -50,8 +50,8 @@ deletionCommand: (DELETE | REMOVE) (line | elementRef);
 invocationCommand: CALL? Element (OF Element)?;
 
 // Common Layer
-fieldModifier: FINAL? modifier TRANSIENT? VOLATILE?;
-variableModifier: FINAL | STATIC;
+fieldModifier: (FINAL | CONST)? modifier TRANSIENT? VOLATILE?;
+variableModifier: (FINAL | CONST) | STATIC;
 modifier: ABSTRACT? STATIC? accessLevel;
 accessLevel: PRIVATE | PUBLIC | PROTECTED;
 localVariableDeclaration: variableModifier* elementsName OF_TYPE Element;
@@ -81,7 +81,6 @@ expression: primary |
             IF expression (equalsVars | isDifferentVars | lessThanEqualsVars | greaterThanEqualVars | greaterThanVars | lessThanVars | IS_NOT | IS) expression THEN command (ELSE command)? |
             NEW (expression | elementRef) |
             ASSIGN expression TO expression;
-
  //    |   expression '.' Identifier
  //    |   expression '.' 'this'
  //    |   expression '.' 'new' nonWildcardTypeArguments? innerCreator
@@ -113,6 +112,7 @@ expression: primary |
  //        |   '%='
  //        )
  //        expression
+
 primary: OPEN_PARENTHESES expression? | Element (OF Element)? | number;
 elementLocation: locationRef (elementRef | line);
 fieldRef:  FIELD (elementsName? OF_TYPE Element | OF_TYPE Element namedElement | elementsName);
@@ -143,6 +143,7 @@ lessThanVars: LESS_THAN | LESS_THAN_MATH | IS_LESS_THAN;
 lessThanEqualsVars: LESS_THAN_EQUAL | LESS_THAN_EQUAL_MATH | LESS_THAN_EQUAL_MATH_SPACE;
 greaterThanVars: GREATER_THAN | GREATER_THAN_MATH | IS_GREATER_THAN;
 greaterThanEqualVars: GREATER_THAN_EQUAL | GREATER_THAN_EQUAL_MATH | GREATER_THAN_EQUAL_MATH_SPACE;
+forEachVars: FOR_EACH | FOR_EACH_SPACE;
 
 /* Lexer */
 
@@ -229,51 +230,52 @@ GREATER_THAN_EQUAL_MATH_SPACE: '> =';
 
 IF: 'if';
 THEN: 'then';
-ABSTRACT      : 'abstract';
-ASSERT        : 'assert';
-//BREAK         : 'break';
-//CASE          : 'case';
-CATCH         : 'catch';
-CLASS         : 'class';
-//CONST         : 'const';
-//CONTINUE      : 'continue';
-//DEFAULT       : 'default';
-DO            : 'do';
-ELSE          : 'else';
-ENUM          : 'enum';
-EXTENDS       : 'extends';
+ABSTRACT: 'abstract';
+ASSERT: 'assert';
+CATCH: 'catch';
+CLASS: 'class';
+CONST: 'const';
+DO: 'do';
+ELSE: 'else';
+ENUM: 'enum';
+EXTENDS: 'extends';
 EXTEND: 'extend';
 THAT_EXTENDS: 'that extends';
-FINAL         : 'final';
-//FINALLY       : 'finally';
-FOR           : 'for';
-IMPLEMENTS    : 'implements';
+FINAL: 'final';
+FOR: 'for';
+IMPLEMENTS: 'implements';
 THAT_IMPLEMENTS: 'that implements';
 IMPLEMENT: 'implement';
-//IMPORT        : 'import';
-//INSTANCEOF    : 'instanceof';
-INTERFACE     : 'interface';
-//NATIVE        : 'native';
-//PACKAGE       : 'package';
-PRIVATE       : 'private';
-PROTECTED     : 'protected';
-PUBLIC        : 'public';
-STATIC        : 'static';
-//STRICTFP      : 'strictfp';
-SUPER         : 'super';
-//SWITCH        : 'switch';
-//SYNCHRONIZED  : 'synchronized';
-THROW         : 'throw';
-THROWS        : 'throws';
-TRANSIENT     : 'transient';
-TRY           : 'try';
-VOID          : 'void';
-VOLATILE      : 'volatile';
-WHILE         : 'while';
-FOR_EACH: 'for each' | 'foreach';
+INTERFACE: 'interface';
+PRIVATE: 'private';
+PROTECTED: 'protected';
+PUBLIC: 'public';
+STATIC: 'static';
+SUPER: 'super';
+THROW: 'throw';
+THROWS: 'throws';
+TRANSIENT: 'transient';
+TRY: 'try';
+VOID: 'void';
+VOLATILE: 'volatile';
+WHILE: 'while';
+FOR_EACH: 'foreach';
+FOR_EACH_SPACE: 'for each';
 THAT_RETURNS: 'that returns';
 RETURNS: 'returns';
 RETURN: 'return';
+SWITCH: 'switch';
+SYNCHRONIZED: 'synchronized';
+STRICTFP: 'strictfp';
+NATIVE: 'native';
+PACKAGE: 'package';
+IMPORT: 'import';
+INSTANCEOF: 'instanceof';
+FINALLY: 'finally';
+CONTINUE: 'continue';
+DEFAULT: 'default';
+BREAK: 'break';
+CASE: 'case';
 
 // Figures
 ZERO: 'zero';
