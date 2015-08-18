@@ -18,21 +18,12 @@ createLoop: createForEachLoop | createWhileLoop | createDoWhileLoop | createForL
 createForEachLoop: FOR_EACH Element IN Element command?;
 createWhileLoop: WHILE expression DO? command?;
 createDoWhileLoop: DO command WHILE expression;
-createForLoop: FOR ;
-/*forControl
-    :   enhancedForControl
-    |   forInit? ';' expression? ';' forUpdate?
-    ;
-
-forInit
-    :   localVariableDeclaration
-//    |   expressionList
-    ;*/
+createForLoop: FOR Element (FROM (number | elementsElement))? (TO (number | elementsElement))? command?;
 
 // Navigation Layer
 navigationCommand: navigationVerb (dataType | FIELD | METHOD)? Element | exitCommand;
 navigationVerb: GO_TO | WE_ARE_DONE_WITH;
-exitCommand: (EXIT | QUIT) (elementRef | (dataType | FIELD | METHOD)? Element);
+exitCommand: (EXIT | QUIT) (elementsElement | (dataType | FIELD | METHOD)? Element);
 exit: WE_ARE_DONE_WITH | EXIT;
 
 // Modification Layer
@@ -44,10 +35,10 @@ modificationVerb: MAKE_IT | CHANGE_IT;
 selectionCommand: (NUMBER | OPTION)? number;
 
 // Deletion Layer
-deletionCommand: (DELETE | REMOVE) (line | elementRef);
+deletionCommand: (DELETE | REMOVE) (line | elementsElement);
 
 // Invocation Layer
-invocationCommand: CALL? Element (OF Element)?;
+invocationCommand: CALL? elementsElement;
 
 // Common Layer
 fieldModifier: (FINAL | CONST)? modifier TRANSIENT? VOLATILE?;
@@ -55,22 +46,15 @@ variableModifier: (FINAL | CONST) | STATIC;
 modifier: ABSTRACT? STATIC? accessLevel;
 accessLevel: PRIVATE | PUBLIC | PROTECTED;
 localVariableDeclaration: variableModifier* elementsName OF_TYPE Element;
-statement: expression | RETURN expression? | TRY CATCH | THROW expression;
-    /*
-    |   ASSERT expression (':' expression)?;
-    |   'if' parExpression statement ('else' statement)?
-    |   'for' '(' forControl ')' statement
-    |   'while' parExpression statement
-    |   'do' statement 'while' parExpression
-    |   'try' block (catchClause+ finallyBlock? | finallyBlock)
-    |   'try' resourceSpecification block catchClause* finallyBlock?
-    |   'switch' parExpression '{' switchBlockStatementGroup* switchLabel* '}'
-    |   'synchronized' parExpression block
-    |   'break' Identifier?
-    |   'continue' Identifier?
-    |   statementExpression
-    |   Identifier ':' statement
-    ;*/
+statement:  expression |
+            RETURN expression? |
+            TRY CATCH? FINALLY? |
+            THROW expression |
+            IF expression (equalsVars | isDifferentVars | lessThanEqualsVars | greaterThanEqualVars | greaterThanVars | lessThanVars | IS_NOT | IS) expression THEN command (ELSE command)? |
+            SWITCH expression? |
+            BREAK |
+            CONTINUE |
+            caseVars elementsElement;
 
 expression: primary |
             expression (plusVars plusVars | minusVars minusVars) |
@@ -78,9 +62,9 @@ expression: primary |
             expression OR expression |
             (plusVars | minusVars | plusVars plusVars | minusVars minusVars) expression |
             expression (equalsVars | isDifferentVars | lessThanEqualsVars | greaterThanEqualVars | greaterThanVars | lessThanVars | IS_NOT | IS) expression |
-            IF expression (equalsVars | isDifferentVars | lessThanEqualsVars | greaterThanEqualVars | greaterThanVars | lessThanVars | IS_NOT | IS) expression THEN command (ELSE command)? |
             NEW (expression | elementRef) |
             ASSIGN expression TO expression;
+
  //    |   expression '.' Identifier
  //    |   expression '.' 'this'
  //    |   expression '.' 'new' nonWildcardTypeArguments? innerCreator
@@ -113,7 +97,8 @@ expression: primary |
  //        )
  //        expression
 
-primary: OPEN_PARENTHESES expression? | Element (OF Element)? | number;
+primary: OPEN_PARENTHESES expression? | elementsElement | number;
+elementsElement: (elementRef OF)? elementRef;
 elementLocation: locationRef (elementRef | line);
 fieldRef:  FIELD (elementsName? OF_TYPE Element | OF_TYPE Element namedElement | elementsName);
 elementRef: classRef | fieldRef | enumRef | interfaceRef | unspecifiedRef;
@@ -144,6 +129,7 @@ lessThanEqualsVars: LESS_THAN_EQUAL | LESS_THAN_EQUAL_MATH | LESS_THAN_EQUAL_MAT
 greaterThanVars: GREATER_THAN | GREATER_THAN_MATH | IS_GREATER_THAN;
 greaterThanEqualVars: GREATER_THAN_EQUAL | GREATER_THAN_EQUAL_MATH | GREATER_THAN_EQUAL_MATH_SPACE;
 forEachVars: FOR_EACH | FOR_EACH_SPACE;
+caseVars : CASE | IN_CASE;
 
 /* Lexer */
 
@@ -178,6 +164,7 @@ WITH: 'with';
 AND: 'and';
 OR: 'or';
 TO: 'to';
+FROM: 'from';
 
 // Commands
 GO_TO: 'go to';
@@ -276,6 +263,7 @@ CONTINUE: 'continue';
 DEFAULT: 'default';
 BREAK: 'break';
 CASE: 'case';
+IN_CASE: 'in case';
 
 // Figures
 ZERO: 'zero';
