@@ -111,7 +111,7 @@ unspecifiedRef: Element;
 reference: NAMED | CALLED;
 locationRef: INSIDE | IN | AFTER | BEFORE | ABOVE | BELOW;
 parametersList: (parameter AND)* parameter;
-parameter: Element OF_TYPE Element;
+parameter: elementsElement (OF_TYPE Element)?;
 dataType: CLASS | ENUM | INTERFACE;
 line: LINE NUMBER? number;
 
@@ -278,6 +278,6 @@ EIGHT: 'eight';
 NINE: 'nine';
 
 // Lexer Core
+WS: [ \t\r\n\u000C]+ -> skip;
 Number: [0-9]+;
-Element: [a-z0-9\-]+;
-WS  :  [ \t\r\n\u000C]+ -> skip;
+Element: [a-zA-Z0-9\-]+;
