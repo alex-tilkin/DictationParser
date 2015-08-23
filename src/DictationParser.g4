@@ -50,7 +50,6 @@ statement:  expression |
             RETURN expression? |
             TRY CATCH? FINALLY? |
             THROW expression |
-            IF expression (equalsVars | isDifferentVars | lessThanEqualsVars | greaterThanEqualVars | greaterThanVars | lessThanVars | IS_NOT | IS) expression THEN command (ELSE command)? |
             SWITCH expression? |
             BREAK |
             CONTINUE |
@@ -58,9 +57,9 @@ statement:  expression |
 
 expression: primary |
             expression (plusVars plusVars | minusVars minusVars) |
-            expression AND expression |
-            expression OR expression |
+            expression (equalsVars | isDifferentVars | lessThanEqualsVars | greaterThanEqualVars | greaterThanVars | lessThanVars | IS_NOT | IS) expression |
             (plusVars | minusVars | plusVars plusVars | minusVars minusVars) expression |
+            IF expression ((AND | OR) expression)* THEN command (ELSE command)? |
             expression (equalsVars | isDifferentVars | lessThanEqualsVars | greaterThanEqualVars | greaterThanVars | lessThanVars | IS_NOT | IS) expression |
             NEW (expression | elementRef) |
             ASSIGN expression TO expression;
@@ -98,7 +97,7 @@ expression: primary |
  //        expression
 
 primary: OPEN_PARENTHESES expression? | elementsElement | number;
-elementsElement: (elementRef OF)? elementRef;
+elementsElement: (elementRef periodVars)? elementRef;
 elementLocation: locationRef (elementRef | line);
 fieldRef: FIELD (elementsName? OF_TYPE Element | OF_TYPE Element namedElement | elementsName);
 elementRef: classRef | fieldRef | enumRef | interfaceRef | unspecifiedRef;
@@ -125,11 +124,12 @@ minusVars: MINUS | MATH_MINUS;
 equalsVars: IS_EQUAL_TO | EQUAL_TO | EQUALS_TO | EQUALS | IS_EQUALS;
 isDifferentVars: IS_DIFFERENT_FROM | DIFFERENT_FROM;
 lessThanVars: LESS_THAN | LESS_THAN_MATH | IS_LESS_THAN;
-lessThanEqualsVars: LESS_THAN_EQUAL | LESS_THAN_EQUAL_MATH | LESS_THAN_EQUAL_MATH_SPACE;
+lessThanEqualsVars: IS_LESS_THAN_EQUALS | IS_LESS_THAN_EQUAL | LESS_THAN_EQUALS | LESS_THAN_EQUAL | LESS_THAN_EQUAL_MATH | LESS_THAN_EQUAL_MATH_SPACE;
 greaterThanVars: GREATER_THAN | GREATER_THAN_MATH | IS_GREATER_THAN;
 greaterThanEqualVars: GREATER_THAN_EQUAL | GREATER_THAN_EQUAL_MATH | GREATER_THAN_EQUAL_MATH_SPACE;
 forEachVars: FOR_EACH | FOR_EACH_SPACE;
 caseVars : CASE | IN_CASE;
+periodVars: PERIOD | PERIOD_CHAR;
 
 /* Lexer */
 
@@ -175,9 +175,11 @@ MAKE_IT: 'make it';
 CHANGE_IT: 'change it to';
 CREATE: 'create';
 OPEN: 'open';
-OPEN_PARENTHESES: 'open pranteces';
+OPEN_PARENTHESES: 'open parentheses';
 CALL: 'call';
 OF: 'of';
+PERIOD: 'period';
+PERIOD_CHAR: '.';
 DELETE: 'delete';
 REMOVE: 'remove';
 ASSIGN: 'assign';
@@ -203,7 +205,10 @@ LESS_THAN: 'less than';
 LESS_THAN_MATH: '<';
 IS_LESS_THAN: 'is less than';
 
+IS_LESS_THAN_EQUAL: 'is less than equal';
+IS_LESS_THAN_EQUALS: 'is less than equals';
 LESS_THAN_EQUAL: 'less than equal';
+LESS_THAN_EQUALS: 'less than equals';
 LESS_THAN_EQUAL_MATH: '<=';
 LESS_THAN_EQUAL_MATH_SPACE: '< =';
 
