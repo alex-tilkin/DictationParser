@@ -100,7 +100,7 @@ expression: primary |
 primary: OPEN_PARENTHESES expression? | elementsElement | number;
 elementsElement: (elementRef OF)? elementRef;
 elementLocation: locationRef (elementRef | line);
-fieldRef:  FIELD (elementsName? OF_TYPE Element | OF_TYPE Element namedElement | elementsName);
+fieldRef: FIELD (elementsName? OF_TYPE Element | OF_TYPE Element namedElement | elementsName);
 elementRef: classRef | fieldRef | enumRef | interfaceRef | unspecifiedRef;
 classRef: CLASS Element;
 namedElement: reference? elementsName;
@@ -114,12 +114,12 @@ parametersList: (parameter AND)* parameter;
 parameter: elementsElement (OF_TYPE Element)?;
 dataType: CLASS | ENUM | INTERFACE;
 line: LINE NUMBER? number;
+number: Number | ZERO | ONE | TWO | THREE | FOUR | FIVE | SIX | SEVEN | EIGHT | NINE;
 
 // Forms of Expressions
 returnsVars: THAT_RETURNS | RETURNS | RETURN;
 implementsVars: IMPLEMENTS | IMPLEMENT | THAT_IMPLEMENTS;
 extendsVars: EXTENDS | EXTEND | THAT_EXTENDS;
-number: Number | ZERO | ONE | TWO | THREE | FOUR | FIVE | SIX | SEVEN | EIGHT | NINE;
 plusVars: PLUS | MATH_PLUS;
 minusVars: MINUS | MATH_MINUS;
 equalsVars: IS_EQUAL_TO | EQUAL_TO | EQUALS_TO | EQUALS | IS_EQUALS;
