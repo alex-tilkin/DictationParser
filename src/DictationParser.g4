@@ -38,7 +38,9 @@ selectionCommand: (NUMBER | OPTION)? number;
 deletionCommand: (DELETE | REMOVE) (line | elementsElement);
 
 // Invocation Layer
-invocationCommand: CALL? elementsElement;
+invocationCommand: CALL? elementsElement arguments?;
+
+arguments: ((THAT_ACCEPTS | WITH) parametersList)?;
 
 // Common Layer
 fieldModifier: (FINAL | CONST)? modifier TRANSIENT? VOLATILE?;
