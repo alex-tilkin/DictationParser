@@ -6,7 +6,7 @@ grammar DictationParser;
 command: creationCommand | navigationCommand | selectionCommand | modificationCommand | deletionCommand | invocationCommand;
 
 // Creation Layer
-creationCommand: creationVerb? (AN | A)? (createField | createMethod | createConstructor | createDataType | createBlock | createLoop) elementLocation?;
+creationCommand: creationVerb? (AN | A)? (createField | createMethod | createConstructor | createDataType /*| createBlock |*/ createLoop) elementLocation?;
 creationVerb: CREATE | NEW | OPEN;
 createField: fieldModifier? fieldRef;
 createMethod: modifier? (METHOD | FUNCTION) namedElement ((THAT_ACCEPTS | WITH) parametersList)? (returnsVars Element)?;
@@ -43,7 +43,7 @@ invocationCommand: CALL? elementsElement;
 // Common Layer
 fieldModifier: (FINAL | CONST)? modifier TRANSIENT? VOLATILE?;
 variableModifier: (FINAL | CONST) | STATIC;
-modifier: ABSTRACT? STATIC? accessLevel;
+modifier: ABSTRACT? STATIC? accessLevel STATIC?;
 accessLevel: PRIVATE | PUBLIC | PROTECTED;
 localVariableDeclaration: variableModifier* elementsName OF_TYPE Element;
 statement:  expression |
@@ -97,18 +97,19 @@ expression: primary |
  //        expression
 
 primary: OPEN_PARENTHESES expression? | elementsElement | number;
-elementsElement: (elementRef periodVars)? elementRef;
+elementsElement: (elementRef (periodVars | OF))? elementRef;
 elementLocation: locationRef (elementRef | line);
 fieldRef: FIELD (elementsName? OF_TYPE Element | OF_TYPE Element namedElement | elementsName);
-elementRef: classRef | fieldRef | enumRef | interfaceRef | unspecifiedRef;
+elementRef: (classRef | fieldRef | enumRef | interfaceRef | methodRef | unspecifiedRef) elementLocation?;
 classRef: CLASS Element;
 namedElement: reference? elementsName;
 elementsName: (Element AND)* Element;
 enumRef: ENUM Element;
 interfaceRef: INTERFACE Element;
+methodRef: METHOD Element;
 unspecifiedRef: Element;
 reference: NAMED | CALLED;
-locationRef: INSIDE | IN | AFTER | BEFORE | ABOVE | BELOW;
+locationRef: INSIDE | IN | AFTER | BEFORE | ABOVE | BELOW | OF;
 parametersList: (parameter AND)* parameter;
 parameter: elementsElement (OF_TYPE Element)?;
 dataType: CLASS | ENUM | INTERFACE;
