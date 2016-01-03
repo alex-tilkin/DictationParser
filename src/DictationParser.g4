@@ -1,17 +1,19 @@
 grammar DictationParser;
 
+/**********/
 /* Parser */
+/**********/
 
 // Top
-command: creationCommand | navigationCommand | selectionCommand | modificationCommand | deletionCommand | invocationCommand;
+command: (creationCommand | navigationCommand | selectionCommand | modificationCommand | deletionCommand | invocationCommand) (AND command)*;
 
 // Creation Layer
-creationCommand: creationVerb? (AN | A)? (createField | createMethod | createConstructor | createDataType /*| createBlock |*/ createLoop) elementLocation?;
+creationCommand: creationVerb? (AN | A)? (createField | createMethod | createConstructor | createDataType | createBlock | createLoop) elementLocation?;
 creationVerb: CREATE | NEW | OPEN;
 createField: fieldModifier? fieldRef;
 createMethod: modifier? (METHOD | FUNCTION) namedElement ((THAT_ACCEPTS | WITH) parametersList)? (returnsVars Element)?;
 createConstructor: modifier? CONSTRUCTOR ((THAT_ACCEPTS | WITH) parametersList)?;
-createDataType: modifier? (INNER)? dataType namedElement ((implementsVars | extendsVars) Element)?;
+createDataType: modifier? (INNER)? dataType namedElement implementsExtends?;
 createBlock: BLOCK | createBlockStatement;
 createBlockStatement: localVariableDeclaration | statement;
 createLoop: createForEachLoop | createWhileLoop | createDoWhileLoop | createForLoop;
@@ -21,7 +23,7 @@ createDoWhileLoop: DO command WHILE expression;
 createForLoop: FOR Element (FROM (number | elementsElement))? (TO (number | elementsElement))? command?;
 
 // Navigation Layer
-navigationCommand: navigationVerb (dataType | FIELD | METHOD)? Element | exitCommand;
+navigationCommand: navigationVerb elementsElement | exitCommand;
 navigationVerb: GO_TO | WE_ARE_DONE_WITH;
 exitCommand: (EXIT | QUIT) (elementsElement | (dataType | FIELD | METHOD)? Element);
 exit: WE_ARE_DONE_WITH | EXIT;
@@ -38,9 +40,9 @@ selectionCommand: (NUMBER | OPTION)? number;
 deletionCommand: (DELETE | REMOVE) (line | elementsElement);
 
 // Invocation Layer
-invocationCommand: CALL? elementsElement arguments?;
+invocationCommand: CALL? TO? elementsElement arguments?;
 
-arguments: ((THAT_ACCEPTS | WITH) parametersList)?;
+arguments: (THAT_ACCEPTS | WITH) parametersList;
 
 // Common Layer
 fieldModifier: (FINAL | CONST)? modifier TRANSIENT? VOLATILE?;
@@ -111,12 +113,13 @@ interfaceRef: INTERFACE Element;
 methodRef: METHOD Element;
 unspecifiedRef: Element;
 reference: NAMED | CALLED;
-locationRef: INSIDE | IN | AFTER | BEFORE | ABOVE | BELOW | OF;
+locationRef: INSIDE | IN | AFTER | BEFORE | ABOVE | BELOW;
 parametersList: (parameter AND)* parameter;
 parameter: elementsElement (OF_TYPE Element)?;
 dataType: CLASS | ENUM | INTERFACE;
 line: LINE NUMBER? number;
 number: Number | ZERO | ONE | TWO | THREE | FOUR | FIVE | SIX | SEVEN | EIGHT | NINE;
+implementsExtends: ((implementsVars | extendsVars) Element AND)* (implementsVars | extendsVars) Element;
 
 // Forms of Expressions
 returnsVars: THAT_RETURNS | RETURNS | RETURN;
@@ -134,7 +137,9 @@ forEachVars: FOR_EACH | FOR_EACH_SPACE;
 caseVars : CASE | IN_CASE;
 periodVars: PERIOD | PERIOD_CHAR;
 
-/* Lexer */
+/***********/
+/*  Lexer  */
+/***********/
 
 // Language idioms
 METHOD: 'method';
