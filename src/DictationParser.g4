@@ -68,38 +68,6 @@ expression: primary |
             NEW (expression | elementRef) |
             ASSIGN expression TO expression;
 
- //    |   expression '.' Identifier
- //    |   expression '.' 'this'
- //    |   expression '.' 'new' nonWildcardTypeArguments? innerCreator
- //    |   expression '.' 'super' superSuffix
- //    |   expression '.' explicitGenericInvocation
- //    |   expression '[' expression ']'
- //    |   expression '(' expressionList? ')'
- //    |   NEW creator
- //    |   '(' type ')' expression
- //    |   ('~'|'!') expression
- //    |   expression ('*'|'/'|'%') expression
- //    |   expression ('+'|'-') expression
-//expression ('<' '<' | '>' '>' '>' | '>' '>') expression
- //    |   expression 'instanceof' type
- //    |   expression '^' expression
- //    |   expression '?' expression ':' expression
- //    |   <assoc=right> expression
- //        (   '='
- //        |   '+='
- //        |   '-='
- //        |   '*='
- //        |   '/='
- //        |   '&='
- //        |   '|='
- //        |   '^='
- //        |   '>>='
- //        |   '>>>='
- //        |   '<<='
- //        |   '%='
- //        )
- //        expression
-
 primary: OPEN_PARENTHESES expression? | elementsElement | number;
 elementsElement: (elementRef (periodVars | OF))? elementRef;
 elementLocation: locationRef (elementRef | line);
