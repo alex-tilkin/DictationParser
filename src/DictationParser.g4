@@ -1,8 +1,8 @@
 grammar DictationParser;
 
-/**********/
+//**********/
 /* Parser */
-/**********/
+//**********/
 
 // Top
 command: (creationCommand | navigationCommand | selectionCommand | modificationCommand | deletionCommand | invocationCommand) (AND command)*;
@@ -10,9 +10,13 @@ command: (creationCommand | navigationCommand | selectionCommand | modificationC
 // Creation Layer
 creationCommand: creationVerb? (AN | A)? (createField | createMethod | createConstructor | createDataType | createBlock | createLoop) elementLocation?;
 creationVerb: CREATE | NEW | OPEN;
+
+// --Done
 createField: fieldModifier? fieldRef;
-createMethod: modifier? (METHOD | FUNCTION) namedElement ((THAT_ACCEPTS | WITH) parametersList)? (returnsVars Element)?;
+createMethod: modifier? (METHOD | FUNCTION) namedElement arguments? (returnsVars (Element | VOID))?;
 createConstructor: modifier? CONSTRUCTOR ((THAT_ACCEPTS | WITH) parametersList)?;
+
+// --Done
 createDataType: modifier? (INNER)? dataType namedElement implementsExtends?;
 createBlock: BLOCK | createBlockStatement;
 createBlockStatement: localVariableDeclaration | statement;
@@ -47,6 +51,8 @@ arguments: (THAT_ACCEPTS | WITH) parametersList;
 // Common Layer
 fieldModifier: (FINAL | CONST)? modifier TRANSIENT? VOLATILE?;
 variableModifier: (FINAL | CONST) | STATIC;
+
+// -- Done
 modifier: ABSTRACT? STATIC? accessLevel STATIC?;
 accessLevel: PRIVATE | PUBLIC | PROTECTED;
 localVariableDeclaration: variableModifier* elementsName OF_TYPE Element;
@@ -71,7 +77,7 @@ expression: primary |
 primary: OPEN_PARENTHESES expression? | elementsElement | number;
 elementsElement: (elementRef (periodVars | OF))? elementRef;
 elementLocation: locationRef (elementRef | line);
-fieldRef: FIELD (elementsName? OF_TYPE Element | OF_TYPE Element namedElement | elementsName);
+fieldRef: FIELD (elementsName OF_TYPE Element | elementsName);
 elementRef: (classRef | fieldRef | enumRef | interfaceRef | methodRef | unspecifiedRef) elementLocation?;
 classRef: CLASS Element;
 namedElement: reference? elementsName;
@@ -83,7 +89,9 @@ unspecifiedRef: Element;
 reference: NAMED | CALLED;
 locationRef: INSIDE | IN | AFTER | BEFORE | ABOVE | BELOW;
 parametersList: (parameter AND)* parameter;
-parameter: elementsElement (OF_TYPE Element)?;
+
+// -- Done
+parameter: Element (OF_TYPE Element)?;
 dataType: CLASS | ENUM | INTERFACE;
 line: LINE NUMBER? number;
 number: Number | ZERO | ONE | TWO | THREE | FOUR | FIVE | SIX | SEVEN | EIGHT | NINE;
@@ -105,9 +113,9 @@ forEachVars: FOR_EACH | FOR_EACH_SPACE;
 caseVars : CASE | IN_CASE;
 periodVars: PERIOD | PERIOD_CHAR;
 
-/***********/
+//***********/
 /*  Lexer  */
-/***********/
+//***********/
 
 // Language idioms
 METHOD: 'method';
